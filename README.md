@@ -103,6 +103,7 @@ If the merge is a success the only thing left to do is push the issue branch bac
 
 You may need to add a comment to your pull request or resubmit your pull request so the reviewer knows you've updated your issue branch.
 
+IMPORTANT: You may have read or heard about updating a branch using git pull instead of using fetch origin and merge; read section "How to work with someone else on a bug" to learn the dangers of git pull.
 
 ### How to handle merge conflicts
 
@@ -178,11 +179,29 @@ git push origin 19872_Fix-Header-Nav
 
 When you attempt to push a local branch up to remote, where the same branch already exists there are two possible outcomes, it will be a success, or the push to remote will fail.  When it fails, this typically means someone has pushed up a commit that you don't yet have, and git wants you to bring your local branch up-to-date before pushing.
 
-We are going to use a short-cut command which does two actions, fetches the changes from remote, and merges them in.
+There are two ways to update your local branch, one is safer than that other.
+
+1. Here are going to use a short-cut command which does two actions, fetches the changes from remote branch, and merges them in.
 
 ```git pull```
 
-We'll assume there is no merge conflict, if there is see merge conflict section.
+The problem with this method is how git knows what remote branch to merge in.  This will only work correctly if you create the local branch with the reference to origin as we did above ```git checkout -b 19872_Fix-Header-Nav origin/19872_Fix-Header-Nav```.
+
+This portion ```origin/19872_Fix-Header-Nav``` makes git aware of what remote branch gets tracked against the local branch you created.
+
+The danger is that, if you forget to state the remote branch when you use ```git pull``` it may not use the correct branch.
+
+2. The longer but safer way.
+
+```
+git status
+git checkout master
+git fetch origin
+git checkout 19872_Fix-Header-Nav
+git merge origin/19872_Fix-Header-Nav
+```
+
+Moving on, we'll assume there was no merge conflict, if there is see merge conflict section.
 
 Now try pushing again.
 

@@ -26,7 +26,7 @@ For this example let's assume we want to create a new branch to work on a bug ti
 
 ```git checkout -b 19872_Fix-Header-Nav origin/dev```
 
-Above we are telling git that we want to switch to a new branch called 19872_Fix-Header-Nav and we want the commit history to be based off of the dev branch.
+Above we are telling git that we want to switch to a new branch called 19872_Fix-Header-Nav and we want the commit history to be based off of the remote dev branch.
 
 If we had not performed the git fetch origin, our issue branch would have been based off stale history of dev and not have the latest changes that are on dev.
 
@@ -149,3 +149,51 @@ git commit -m "19872 Resolved merging in dev into 19872_Fix-Header-Nav"
 ```
 
 Above in the first line we added all modified files, on the second we verified only the files we wanted staged are there, and the last we commit the fixes.
+
+
+### How to work with someone else on a bug
+
+This section assumes that someone has an issue branch, has pushed up the issue branch to remote and you need to pull it down, work on it, and push it back up.  We are assuming you do not yet have a local copy of the branch.  Let's assume the remote branch is "19872_Fix-Header-Nav".
+
+```
+git status
+git checkout master
+git fetch origin
+```
+
+We've covered the necessity of the commands above in other sections.  Now we are going to create a local copy of remote branch 19872_Fix-Header-Nav, and we are going to switch to it as our active branch.
+
+```git checkout -b 19872_Fix-Header-Nav origin/19872_Fix-Header-Nav```
+
+Now you can do your work.
+
+When you are ready to commit you can follow the same commands we've covered in other sections above.
+
+```
+git status
+git add -A
+git commit -m "19872 tweaked title alignment"
+git push origin 19872_Fix-Header-Nav
+```
+
+When you attempt to push a local branch up to remote, where the same branch already exists there are two possible outcomes, it will be a success, or the push to remote will fail.  When it fails, this typically means someone has pushed up a commit that you don't yet have, and git wants you to bring your local branch up-to-date before pushing.
+
+We are going to use a short-cut command which does two actions, fetches the changes from remote, and merges them in.
+
+```git pull```
+
+We'll assume there is no merge conflict, if there is see merge conflict section.
+
+Now try pushing again.
+
+```git push origin 19872_Fix-Header-Nav```
+
+Let's now assume that you go to lunch and when you come back your teammate says that they've made another change and want you to do some additional work.  Let's assume that you have not deleted your local 19872_Fix-Header-Nav branch, it exists locally, but let's also assume your active branch is some random branch.
+
+```
+git status
+git checkout 19872_Fix-Header-Nav
+git pull
+```
+
+The above commands assume you didn't see any modified files when you performed the git status.  We've covered the commands above already, so it should make sense what we are doing.  You are now ready to do your additional work.

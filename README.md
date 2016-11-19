@@ -4,6 +4,7 @@ This document assumes the following branching strategy:
 - dev : branch for sprint work
 - XXX : branch representing a release candidate, the XXX would be a numerical identifier of the build
 - master : branch that will be kept at same state as Production. The XXX branch will be merged into master after a Production release.
+- ISSUEBRANCH : issue branches are branched from dev or XXX depending on if the work is for a sprint or fix QA/UAT bug.
 
 
 ### Create new bug ticket issue branch

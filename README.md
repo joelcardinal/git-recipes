@@ -1,10 +1,15 @@
 # Git Workflow Recipes
 
-This document assumes the following branching strategy:
+This document assumes the following basic branching strategy:
 - dev : branch for sprint work
 - XXX : branch representing a release candidate, the XXX would be a numerical identifier of the build
 - master : branch that will be kept at same state as Production. The XXX branch will be merged into master after a Production release.
-- ISSUEBRANCH : issue branches are branched from dev or XXX depending on if the work is for a sprint or fix QA/UAT bug.
+
+It's best to first read this from top to bottom, as many of the commands are used for multiple recipes they are typically only explained once when first mentioned.
+
+The goal of this document is meant to provide very basic "how to get stuff done", utilizing the most basic git commands in the terminal.  It is not meant to fully explain git nor the intricacies of each command, I highly encourage you to take a deep dive into learning git.
+
+For more information about additional commands and online resources checkout my git cheat sheet: https://github.com/joelcardinal/git-cheat-sheet
 
 
 ### Create new bug ticket issue branch
@@ -216,4 +221,122 @@ git checkout 19872_Fix-Header-Nav
 git pull
 ```
 
-The above commands assume you didn't see any modified files when you performed the git status.  We've covered the commands above already, so it should make sense what we are doing.  You are now ready to do your additional work.
+We'll assume you didn't see any modified files when you performed the git status and git pull didn't lead to a merge conflict.  We've covered the commands above already, so it should make sense what we are doing.  You are now ready to do your additional work.
+
+
+### How to fix QA/UAT issue on branch XXX
+
+This workflow is nearly the same as "Create new bug ticket issue branch", with some minor changes, so I'll just point out the differences.
+
+```
+git status
+git checkout master
+git fetch origin
+git checkout -b 19872_QA-Bug origin/XXX
+git status
+git add -A
+git commit -m "19872 Fixed QA bug"
+git push origin 19872_QA-Bug
+```
+
+Notice above when we create and switch to a new bug we point the remote tracking branch to the remote XXX branch, doing so allows use to use git pull in case the push to origin fails due to new commits on remote which we discussed in another section above.
+
+With your issue branch pushed up, you are ready to issue a pull request using your remote repo host's interface.  When you perform the pull request you'll want to set the branch you wish to have your issue branch merged into as XXX.
+
+
+### How to work on a hotfix
+
+In the branching strategy we described at the top of the page there should typically be only one XXX branch which is the release candidate, which is undergoing QA/UAT.
+
+This section assumes there is a particualar branching strategy for a hotfix, where a XXX branch is created from master and hotfix work initiates a pull requrest on this hotfix XXX branch.
+
+Let's first clarify how branches are maintained.  Typically, there will be two branches, dev and master.  Sprint issue branches are branched off dev and there subsequent pull requests for these issue branches will be against dev, as we've already explored in sections above.
+
+When a sprint is ready for QA/UAT and new XXX branch is created off of dev branch.
+
+After a release the XXX branch is merged into master then deleted.
+
+Let's run through a scenario.  First we start with dev and master.
+
+```
+dev
+master
+```
+
+A sprint is over and we branch off dev to create our XXX release candidate branch, we'll call it 250.
+
+```
+dev
+master
+250
+```
+
+Now let's say 250 is released, it then gets merged into master.
+
+```
+dev
+master
+```
+
+Now let's say a new sprint is ready to be branched from dev, we'll call it 251.
+
+```
+dev
+master
+251
+```
+
+Now assume there is a bad bug in Production and we need a hotfix, we'll need to create the 250 branch again that the developer can issue pull requests against.
+
+```
+dev
+master
+250
+251
+```
+
+Let's assume the developer's pull request was accepted and 250 was released again, subsequently 250 will get merged into master then deleted.
+
+```
+dev
+master
+251
+```
+
+That was an overview of the branching strategy, let's go over what a developer needs to do.
+
+Using our example above, let's go back in time to the point where sprint 251 is ready for QA/UAT.
+
+```
+dev
+master
+251
+```
+
+A Production bug is found and a hotfix for 250 is required.  We'll assume there is only one hotfix issue and branch 250 does not exist so we need to create it, then create our hotfix issue branch off of it.  Since the 250 release build is in master we'll branch off master to create the 250 branch. 
+
+```
+git status
+git checkout master
+git fetch origin
+git checkout -b 250 origin/master
+```
+
+The last line above creates the 250 branch off of remote master, but this 250 branch only exists locally, we still need to push it up to remote.
+
+```git push origin 250```
+
+The 250 branch exists locally and remotely, but we now need to create the hotfix issue branch that we will do our work in.  Note below we track against remote 250.
+
+```git checkout -b 19872_Hotfix-Bug origin/250```
+
+We are ready to do our hotfix work in 19872_Hotfix-Bug.  When we are done, we commit and push up the hotfix issue branch.
+
+```
+git status
+git add -A
+git commit -m "19872 Fixed hotfix bug"
+git push origin 19872_Hotfix-Bug
+```
+
+You can now issue a pull request for branch 19872_Hotfix-Bug against hotfix branch 250.

@@ -11,6 +11,7 @@ The goal of this document is meant to provide very basic "how to get stuff done"
 
 For more information about additional commands and online resources checkout my git cheat sheet: https://github.com/joelcardinal/git-cheat-sheet
 
+Note: Below when git commands are listed in a block one on top of the other, that means we are executing the terminal commands sequentially one after the other.
 
 ### Create new bug ticket issue branch
 
@@ -27,6 +28,10 @@ Make git aware of any changes on the remote repo.
 ```git fetch origin```
 
 NOTE: It's important to remember the command above only makes git aware of changes, but it has not brought any local branches up-to-date.
+
+Unfortunately, the above command makes git aware of commit changes, but doesn't do all the housekeeping of removing references to deleted remote branches.  The following command takes care of that, hereafter we'll use the shell's ```&&``` "and" syntax to execute both commands one after the other.
+
+```git fetch --prune```
 
 For this example let's assume we want to create a new branch to work on a bug ticket.
 
@@ -90,7 +95,7 @@ For this example, we'll assume you are on your issue branch and no modified file
 
 ```
 git checkout master
-git fetch origin
+git fetch origin && git fetch --prune
 ```
 
 Now that git knows the lastest changes to the dev branch let's bring those changes into our issue branch.
@@ -165,7 +170,7 @@ This section assumes that someone has an issue branch, has pushed up the issue b
 ```
 git status
 git checkout master
-git fetch origin
+git fetch origin && git fetch --prune
 ```
 
 We've covered the necessity of the commands above in other sections.  Now we are going to create a local copy of remote branch 19872_Fix-Header-Nav, and we are going to switch to it as our active branch.
@@ -202,7 +207,7 @@ The danger is that, if you forget to state the remote branch when you use ```git
 ```
 git status
 git checkout master
-git fetch origin
+git fetch origin && git fetch --prune
 git checkout 19872_Fix-Header-Nav
 git merge origin/19872_Fix-Header-Nav
 ```
@@ -231,7 +236,7 @@ This workflow is nearly the same as "Create new bug ticket issue branch", with s
 ```
 git status
 git checkout master
-git fetch origin
+git fetch origin && git fetch --prune
 git checkout -b 19872_QA-Bug origin/XXX
 git status
 git add -A
@@ -318,7 +323,7 @@ A Production bug is found and a hotfix for 250 is required.  We'll assume there 
 ```
 git status
 git checkout master
-git fetch origin
+git fetch origin && git fetch --prune
 git checkout -b 250 origin/master
 ```
 

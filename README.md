@@ -345,3 +345,68 @@ git push origin 19872_Hotfix-Bug
 ```
 
 You can now issue a pull request for branch 19872_Hotfix-Bug against hotfix branch 250.
+
+
+### Update dev after patching release candidate (XXX)
+
+This git recipe is for the branch maintainers, this won't be applicable to dev contributers.  In this example let's assume that a pull-request to release candidate branch 250 for a QA/UAT issue was accepted and merged in.  This means that branch 250 is ahead of branch dev, as the commit(s) that were merged into 250 for the pull-request have not been added yet to branch dev.  As it is likely merging 250 into dev will result in a merge conflict we will need to do this manually (instead of automating in a build/patch script).
+
+It's important to note that we'll need a local dev branch to first update, as with git you can't merge one remote branch into another remote branch, you need to do your merging locally then push up the changes, as you'll see below.
+
+Okay, first thing we always do is check current status of files to see if we left any current work uncommitted or needs stashing, then we'll update our reference to remote and prune any removed branches.
+
+```
+git status
+git checkout master
+git fetch origin && git fetch --prune
+```
+
+What you need to do next depends on if you have a local dev branch or not, it is likely that you do not, but I'll show what to do in each case.
+
+First let's assume we forgot if we have a local dev branch, so let's list our local branches.  Notice below we don't use the -a option, this will only print local branches.
+
+```
+git branch
+```
+
+Let's assume the command above printed:
+
+```
+*12220_Bug-Issue
+ master
+```
+ 
+It looks like we don't have a local dev branch so we need to first create one, a practice we've already covered above.
+
+```
+git checkout -b dev origin/dev
+```
+
+Above we created a local dev branch from remote, we're ready to merge remote 250 into our local dev branch.  You can go to Step 2.
+
+Okay, let's take a step back and see what to do if you did have a local dev branch and ```git branch``` printed out something like the following:
+
+```
+*12220_Bug-Issue
+ dev
+ master
+```
+
+Since we already have a local copy of dev, we just need to switch to the branch, then update it before we merge in remote 250 branch.
+
+```
+git checkout dev
+git merge origin/dev
+```
+
+Step 2.  Now we can merge remote 250 branch into our local dev branch.
+
+```
+git merge origin/250
+```
+
+We're not finished, we need to now push the updated dev branch to remote.
+
+```
+git push origin dev
+```
